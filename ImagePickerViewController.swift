@@ -4,11 +4,12 @@ import SwiftyJSON
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     let imagePicker = UIImagePickerController()
-    let session = URLSession.shared
     
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var spinner: UIActivityIndicatorView!
     @IBOutlet weak var labelResults: UITextView!
+    let session = URLSession.shared
+    
     
     var googleAPIKey = "YOUR_API_KEY"
     var googleURL: URL {
@@ -53,10 +54,10 @@ extension ViewController {
             let errorObj: JSON = json["error"]
             
             self.spinner.stopAnimating()
-            self.imageView.isHidden = true
             self.labelResults.isHidden = false
             self.faceResults.isHidden = false
             self.faceResults.text = ""
+            self.imageView.isHidden = true
             
             // Check for errors
             if (errorObj.dictionaryValue != [:]) {
@@ -122,36 +123,6 @@ extension ViewController {
                 }
             }
         })
-        
-    }
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            imageView.contentMode = .scaleAspectFit
-            imageView.isHidden = true // You could optionally display the image here by setting imageView.image = pickedImage
-            spinner.startAnimating()
-            faceResults.isHidden = true
-            labelResults.isHidden = true
-            
-            // Base64 encode the image & create the request
-            let binaryImageData = base64EncodeImage(pickedImage)
-            createRequest(with: binaryImageData)
-        }
-        
-        dismiss(animated: true, completion: nil)
-    }
-    
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    func resizeImage(_ imageSize: CGSize, image: UIImage) -> Data {
-        UIGraphicsBeginImageContext(imageSize)
-        image.draw(in: CGRect(x: 0, y: 0, width: imageSize.width, height: imageSize.height))
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        let resizedImage = UIImagePNGRepresentation(newImage!)
-        UIGraphicsEndImageContext()
-        return resizedImage!
     }
 }
 
